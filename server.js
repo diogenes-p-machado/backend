@@ -10,29 +10,28 @@ const db = new sqlite3.Database(':memory:')
 
 db.serialize(() => {
   db.run('ATTACH DATABASE db AS rh')
-  db.run('CREATE TABLE IF NOT EXISTS rh.pessoa (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT)')
-  db.run('CREATE TABLE IF NOT EXISTS rh.departamento (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT)')
-  db.run('CREATE TABLE IF NOT EXISTS rh.departamento_pessoa (id_departamento INTEGER, id_pessoa INTEGER)')
+  db.run('CREATE TABLE IF NOT EXISTS rh.pessoa (id_pessoa INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT)')
+  db.run('CREATE TABLE IF NOT EXISTS rh.pai_filho (pai INTEGER, filho INTEGER)')
 })
 
 app.route('/:schema/:table')
 
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.table}`, (err, rows) => {
-      rows.map((l) => {l.location = `${req.params.schema}/${req.params.table}/${l.id}`})
+      rows.map((l) => { l.location = `${req.params.schema}/${req.params.table}/${l.id}` })
       res.json(rows)
     })
   })
 
   .post((req, res) => {
     let keys = Object.keys(req.body)
-    let values = Object.values(req.body)    
-      db.run(`insert into ${req.params.schema}.${req.params.table} (${keys.join(", ")}) values (${keys.map(() => "?").join(", ")})`, 
+    let values = Object.values(req.body)
+    db.run(`insert into ${req.params.schema}.${req.params.table} (${keys.join(", ")}) values (${keys.map(() => "?").join(", ")})`,
       values
-      , function(){
+      , function () {
         res.setHeader("lastID", this.lastID)
         res.sendStatus(201)
-      })                   
+      })
   })
 
 app.route('/:schema/:table/:id')
@@ -44,24 +43,46 @@ app.route('/:schema/:table/:id')
   })
 
   .put((req, res) => {
-    db.run(`UPDATE ${req.params.schema}.${req.params.table} SET ${keysUpdate.join(", ")} WHERE id = ${req.params.id}`, 
-        values
-        , function(){
-          res.setHeader("changes", this.changes)
-          res.sendStatus(204)
-        })
+    db.run(`UPDATE ${req.params.schema}.${req.params.table} SET ${keysUpdate.join(", ")} WHERE id = ${req.params.id}`,
+      values
+      , function () {
+        res.setHeader("changes", this.changes)
+        res.sendStatus(204)
+      })
   })
 
   .delete((req, res) => {
-    res.send('')
+    db.run(`DELETE FROM ${req.params.schema}.${req.params.table} WHERE id = ${req.params.id}`,
+      values
+      , function () {
+        res.setHeader("changes", this.changes)
+        res.sendStatus(204)
+      })
   })
 
 app.route('/:schema/:table/:id/:other_table')
+
   .get((req, res) => {
-    res.send('')
+    db.all(`select * from ${req.params.schema}.${req.params.other_table} where id = ${req.params.id}`, (err, rows) => {
+      res.json(rows)
+    })
   })
+
   .post((req, res) => {
-    res.send('')
+    if (req.body.id) {
+      db.run(`insert into ${req.params.schema}.${req.params.table}_${req.params.other_table} values (${req.params.id}, ${req.body.id})`, (err) => {
+        res.sendStatus(201)
+      })
+    } else {
+      req.body.id = req.params.id
+      let keys = Object.keys(req.body)
+      let values = Object.values(req.body)
+      db.run(`insert into ${req.params.schema}.${req.params.other_table} (${keys.join(", ")}) values (${keys.map(() => "?").join(", ")})`,
+        values
+        , (err) => {
+          res.sendStatus(201)
+        })
+    }
   })
 
 app.listen(port, () => {
