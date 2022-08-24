@@ -52,9 +52,8 @@ app.route('/:schema/:table/:id')
   })
 
   .delete((req, res) => {
-    db.run(`DELETE FROM ${req.params.schema}.${req.params.table} WHERE id = ${req.params.id}`,
-      values
-      , function () {
+    db.run(`DELETE FROM ${req.params.schema}.${req.params.table} WHERE id = ${req.params.id}`,     
+      function () {
         res.setHeader("changes", this.changes)
         res.sendStatus(204)
       })

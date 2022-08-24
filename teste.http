@@ -2,9 +2,13 @@ POST http://0.0.0.0:3000/rh/pessoa HTTP/1.1
 content-type: application/json
 
 {       
-    "nome": "ssss"   
+    "nome": "Darlan Pereira Machado"   
 }
 
 ###
-GET http://0.0.0.0:3000/rh/pessoa
 
+GET http://0.0.0.0:3000/rh/pessoa/
+
+###
+
+DELETE http://0.0.0.0:3000/rh/pessoa/5
