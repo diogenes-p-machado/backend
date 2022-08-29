@@ -7,7 +7,7 @@ content-type: application/json
 
 ###
 
-GET http://0.0.0.0:3000/rh/pessoa/
+GET http://0.0.0.0:3000/rh/pessoa/1
 
 ###
 

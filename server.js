@@ -37,8 +37,8 @@ app.route('/:schema/:table')
 app.route('/:schema/:table/:id')
 
   .get((req, res) => {
-    db.get(`select * from ${req.params.schema}.${req.params.table} where id = ${req.params.id}`, (err, row) => {
-      res.json(row.location = `${req.params.schema}/${req.params.table}/${row.id}`)
+    db.get(`select * from ${req.params.schema}.${req.params.table} where id = ${req.params.id}`, (err, row) => {     
+      res.json(row)
     })
   })
 
