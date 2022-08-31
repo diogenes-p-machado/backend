@@ -1,10 +1,12 @@
 const express = require('express')
 const sqlite3 = require('sqlite3')
 const app = express()
+var cors = require('cors')
 const port = 3000
 const host = '0.0.0.0';
 
 app.use(express.json())
+app.use(cors())
 
 const db = new sqlite3.Database(':memory:')
 
@@ -18,7 +20,11 @@ app.route('/:schema/:table')
 
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.table}`, (err, rows) => {
-      rows.map((l) => { l.location = `${req.params.schema}/${req.params.table}/${l.id}` })
+      rows.map((l) => {
+        l.location = `${req.params.schema}/${req.params.table}/${l.id}`
+        l.id = String(l.id)
+      })
+
       res.json(rows)
     })
   })
@@ -37,7 +43,8 @@ app.route('/:schema/:table')
 app.route('/:schema/:table/:id')
 
   .get((req, res) => {
-    db.get(`select * from ${req.params.schema}.${req.params.table} where id = ${req.params.id}`, (err, row) => {     
+    db.get(`select * from ${req.params.schema}.${req.params.table} where id = ${req.params.id}`, (err, row) => {
+      row.id = String(row.id)
       res.json(row)
     })
   })
@@ -52,7 +59,7 @@ app.route('/:schema/:table/:id')
   })
 
   .delete((req, res) => {
-    db.run(`DELETE FROM ${req.params.schema}.${req.params.table} WHERE id = ${req.params.id}`,     
+    db.run(`DELETE FROM ${req.params.schema}.${req.params.table} WHERE id = ${req.params.id}`,
       function () {
         res.setHeader("changes", this.changes)
         res.sendStatus(204)
