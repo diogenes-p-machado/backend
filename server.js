@@ -20,8 +20,7 @@ app.route('/:schema/:table')
 
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.table}`, (err, rows) => {
-      rows.map((l) => {
-        l.location = `${req.params.schema}/${req.params.table}/${l.id}`
+      rows.map((l) => {        
         l.id = String(l.id)
       })
 
