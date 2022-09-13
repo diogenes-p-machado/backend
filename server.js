@@ -20,7 +20,7 @@ app.route('/:schema/:table')
 
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.table}`, (err, rows) => {
-      rows.map((l) => {        
+      rows.map((l) => {
         l.id = String(l.id)
       })
 
@@ -74,21 +74,32 @@ app.route('/:schema/:table/:id/:other_table')
   })
 
   .post((req, res) => {
-    if (req.body.id) {
-      db.run(`insert into ${req.params.schema}.${req.params.table}_${req.params.other_table} values (${req.params.id}, ${req.body.id})`, (err) => {
+    let keys = Object.keys(req.body)
+    let values = Object.values(req.body)
+    db.run(`insert into ${req.params.schema}.${req.params.other_table} (${keys.join(", ")}) values (${keys.map(() => "?").join(", ")})`,
+      values
+      , (err) => {
         res.sendStatus(201)
       })
-    } else {
-      req.body.id = req.params.id
-      let keys = Object.keys(req.body)
-      let values = Object.values(req.body)
-      db.run(`insert into ${req.params.schema}.${req.params.other_table} (${keys.join(", ")}) values (${keys.map(() => "?").join(", ")})`,
-        values
-        , (err) => {
-          res.sendStatus(201)
-        })
-    }
+
   })
+
+
+app.route('/:schema/:table/:id/:other_table/:id_other')
+
+  .put((req, res) => {
+    db.run(`insert into ${req.params.schema}.${req.params.table}_${req.params.other_table} values (${req.params.id}, ${req.params.other_table})`, (err) => {
+      res.sendStatus(201)
+    })
+  })
+ 
+  .delete((req, res) => {
+    db.run(`delete from ${req.params.schema}.${req.params.table}_${req.params.other_table} as tbl
+    where tbl.${req.params.table} = ${req.params.id} and ${req.params.other_table} = ${req.params.id_other}`, (err) => {
+      res.sendStatus(201)
+    })
+  })
+  
 
 app.listen(port, () => {
   console.log(`Example app listening on host ${host} port ${port}`)
