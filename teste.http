@@ -1,14 +1,14 @@
-POST http://0.0.0.0:3000/rh/pessoa/1/except_filho HTTP/1.1
+POST http://0.0.0.0:3000/rh/pessoa/2/telefone HTTP/1.1
 content-type: application/json
 
 {     
     
-    "nome": "Darlan Pereira Machado"   
+    "numero": "69-32382413"   
 }
 
 ###
 
-GET http://0.0.0.0:3000/rh/pessoa/1/except_filho
+GET http://0.0.0.0:3000/rh/telefone
 ###
 
 DELETE http://0.0.0.0:3000/rh/pessoa/5

@@ -2,6 +2,7 @@ const express = require('express')
 const sqlite3 = require('sqlite3')
 const app = express()
 var cors = require('cors')
+const { json } = require('express')
 const port = 3000
 const host = '0.0.0.0';
 
@@ -19,7 +20,11 @@ app.route('/:schema/:table')
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.table}`, (err, rows) => {
       rows.map((l) => {
-        l[`id_${req.params.table}`] = String(l[`id_${req.params.table}`])
+        for(const i in l){
+            if (i.startsWith('id_')){
+              l[i] = String(l[i])
+            }
+        }
       })
 
       res.json(rows)
@@ -67,8 +72,15 @@ app.route('/:schema/:table/:id/:other_table')
 
   .get((req, res) => {
     db.all(`select * from ${req.params.schema}.${req.params.other_table} where id_${req.params.table} = ${req.params.id}`, (err, rows) => {
+      rows.map((l) => {
+        for(const i in l){
+          if (i.startsWith('id_')){
+            l[i] = String(l[i])
+          }
+      }
+      })
       res.json(rows)
-    })
+    })    
   })
 
   .post((req, res) => {
@@ -79,8 +91,7 @@ app.route('/:schema/:table/:id/:other_table')
       values
       , (err) => {
         res.sendStatus(201)
-      })
-    res.json(req.body)
+      })  
 
   })
 
