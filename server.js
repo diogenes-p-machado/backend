@@ -1,8 +1,7 @@
 const express = require('express')
 const sqlite3 = require('sqlite3')
 const app = express()
-var cors = require('cors')
-const { json } = require('express')
+const cors = require('cors')
 const port = 3000
 const host = '0.0.0.0';
 
@@ -92,23 +91,6 @@ app.route('/:schema/:table/:id/:other_table')
       , (err) => {
         res.sendStatus(201)
       })  
-
-  })
-
-
-app.route('/:schema/:table/:id/:other_table/:id_other')
-
-  .put((req, res) => {
-    db.run(`insert into ${req.params.schema}.${req.params.table}_${req.params.other_table} values (${req.params.id}, ${req.params.other_table})`, (err) => {
-      res.sendStatus(201)
-    })
-  })
-
-  .delete((req, res) => {
-    db.run(`delete from ${req.params.schema}.${req.params.table}_${req.params.other_table} as tbl
-    where tbl.${req.params.table} = ${req.params.id} and ${req.params.other_table} = ${req.params.id_other}`, (err) => {
-      res.sendStatus(201)
-    })
   })
 
 

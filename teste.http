@@ -8,7 +8,7 @@ content-type: application/json
 
 ###
 
-GET http://0.0.0.0:3000/rh/telefone
+GET http://0.0.0.0:3000/rh/pai/1/filho
 ###
 
 DELETE http://0.0.0.0:3000/rh/pessoa/5
