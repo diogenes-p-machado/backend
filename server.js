@@ -74,7 +74,7 @@ app.route('/:schema/:table/:id/:other_table')
       rows.map((l) => {
         for(const i in l){
           if (i.startsWith('id_')){
-            l[i] = String(l[i])
+            l[i] = String(l[i]) 
           }
       }
       })
